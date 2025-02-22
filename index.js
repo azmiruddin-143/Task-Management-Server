@@ -78,7 +78,6 @@ async function run() {
       res.send(result)
     })
 
-
     app.put('/task/update/:id', async (req, res) => {
       const { id } = req.params;
       const { category } = req.body;
@@ -92,8 +91,8 @@ async function run() {
       } catch (error) {
           res.status(500).send({ success: false, message: "Failed to update category" });
       }
-  });
-
+  }); 
+    
 
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
