@@ -1,17 +1,14 @@
 require('dotenv').config()
 const express = require('express');
 const app = express()
-const cors = require('cors');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const cors = require('cors');
 const port = process.env.PORT || 5000
 app.use(express.json())
 app.use(cors())
 
 // mongodb start //
-
-const uri = `mongodb+srv://${process.env.TASK_USER}:${process.env.TASK_PASS}@cluster0.8luat.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
-
-
+const uri = `mongodb+srv://${process.env.DB_FOODUSSER}:${process.env.DB_FOODPASS}@cluster0.wc7vd.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
@@ -24,8 +21,9 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
     // Send a ping to confirm a successful connection
+    // await client.db("admin").command({ ping: 1 });
     const database = client.db("TaskManager");
     const usersCollection = database.collection("users");
     const taskCollection = database.collection("task");
@@ -80,7 +78,22 @@ async function run() {
       res.send(result)
     })
 
-    // await client.db("admin").command({ ping: 1 });
+
+    app.put('/task/update/:id', async (req, res) => {
+      const { id } = req.params;
+      const { category } = req.body;
+  
+      try {
+          const result = await taskCollection.updateOne(
+              { _id: new ObjectId(id) },
+              { $set: { category: category } }
+          );
+          res.send({ success: true, message: "Task category updated" });
+      } catch (error) {
+          res.status(500).send({ success: false, message: "Failed to update category" });
+      }
+  });
+
 
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
@@ -89,7 +102,6 @@ async function run() {
   }
 }
 run().catch(console.dir);
-
 
 
 
